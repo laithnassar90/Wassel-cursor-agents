@@ -2,6 +2,7 @@ import { useState, useEffect, Suspense, lazy } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Toaster } from "./components/ui/sonner";
 import { PageLoadingFallback, ComponentLoadingFallback } from "./components/LoadingSpinner";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Lazy load all major components
 const LandingPage = lazy(() => import("./components/LandingPage"));
@@ -228,8 +229,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ErrorBoundary level="critical" onError={(error, errorInfo) => {
+      console.error('Critical app error:', error, errorInfo);
+    }}>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
