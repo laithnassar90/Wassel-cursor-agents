@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { logError } from '../utils/logger';
 import { User, Session, AuthChangeEvent } from '@supabase/supabase-js';
 import { supabase, getUserProfile, isSupabaseConfigured } from '../utils/supabase/client';
 import type { Database } from '../utils/supabase/database.types';
@@ -143,8 +144,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       return { error: null };
     } catch (error) {
-      console.error('Signup error:', error);
-      return { error };
+      logError('Signup error', { error });
+      return { error } as any;
     }
   };
 
@@ -164,8 +165,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       return { error: null };
     } catch (error) {
-      console.error('Sign in error:', error);
-      return { error };
+      logError('Sign in error', { error });
+      return { error } as any;
     }
   };
 
@@ -179,7 +180,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setProfile(null);
       setSession(null);
     } catch (error) {
-      console.error('Sign out error:', error);
+      logError('Sign out error', { error });
     }
   };
 
@@ -201,8 +202,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       return { error: null };
     } catch (error) {
-      console.error('Update profile error:', error);
-      return { error };
+      logError('Update profile error', { error });
+      return { error } as any;
     }
   };
 

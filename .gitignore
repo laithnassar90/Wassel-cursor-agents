@@ -1,0 +1,19 @@
+# Build artifacts
+build/
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor/OS
+.DS_Store
+*.log
+
+# Dependencies
+node_modules/
+
+# Locks (optional - keep one if team standard)
+pnpm-lock.yaml
+yarn.lock

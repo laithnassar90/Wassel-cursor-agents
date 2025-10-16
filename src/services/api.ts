@@ -86,8 +86,26 @@ export const authAPI = {
 
 // ============ TRIPS API ============
 
+type CreateTripPayload = {
+  vehicle_id?: string | null;
+  trip_type: 'wasel' | 'raje3';
+  status?: 'draft' | 'published' | 'active' | 'completed' | 'cancelled';
+  from_location: string;
+  from_lat: number;
+  from_lng: number;
+  to_location: string;
+  to_lat: number;
+  to_lng: number;
+  departure_date: string; // YYYY-MM-DD
+  departure_time: string; // HH:MM:SS
+  available_seats: number;
+  price_per_seat: number;
+  notes?: string | null;
+  instant_booking?: boolean;
+};
+
 export const tripsAPI = {
-  async createTrip(tripData: any) {
+  async createTrip(tripData: CreateTripPayload) {
     const token = authToken;
     if (!token) throw new Error('Not authenticated');
 

@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { logError } from '../logger';
 import type { Database } from './database.types';
 
 // Get environment variables - check both import.meta.env and process.env for compatibility
@@ -80,7 +81,7 @@ export async function getUserProfile(userId?: string) {
     .single();
     
   if (error) {
-    console.error('Error fetching profile:', error);
+    logError('Error fetching profile', { error });
     return null;
   }
   

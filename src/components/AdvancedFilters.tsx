@@ -19,7 +19,7 @@ interface AdvancedFiltersProps {
       quietRide: boolean;
     };
   };
-  onFiltersChange: (filters: any) => void;
+  onFiltersChange: (filters: AdvancedFiltersProps['filters']) => void;
   onClear: () => void;
 }
 

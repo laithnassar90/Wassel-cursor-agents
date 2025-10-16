@@ -117,12 +117,28 @@ function toRad(deg: number): number {
 }
 
 // Main matching function
+type AvailableTrip = {
+  id: string;
+  driverId: string;
+  driverName: string;
+  driverRating: number;
+  price: number;
+  departureTime: string;
+  availableSeats: number;
+  vehicleType: string;
+  verified: boolean;
+  from: RoutePoint;
+  to: RoutePoint;
+  stops?: RoutePoint[];
+  driverPreferences: UserPreferences;
+};
+
 export function matchTrips(
   userRoute: { from: RoutePoint; to: RoutePoint },
   userPreferences: UserPreferences,
   userMaxPrice: number,
   userMinRating: number,
-  availableTrips: any[]
+  availableTrips: AvailableTrip[]
 ): TripMatch[] {
   const matches: TripMatch[] = [];
   
