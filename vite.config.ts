@@ -2,9 +2,19 @@
   import { defineConfig } from 'vite';
   import react from '@vitejs/plugin-react-swc';
   import path from 'path';
+  import { visualizer } from 'rollup-plugin-visualizer';
 
-  export default defineConfig({
-    plugins: [react()],
+  export default defineConfig(({ mode }) => ({
+    plugins: [
+      react(),
+      // Bundle analyzer
+      mode === 'analyze' && visualizer({
+        filename: 'dist/stats.html',
+        open: true,
+        gzipSize: true,
+        brotliSize: true
+      })
+    ].filter(Boolean),
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
@@ -55,9 +65,43 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Vendor chunks
+            'react-vendor': ['react', 'react-dom'],
+            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
+            'utils-vendor': ['clsx', 'class-variance-authority', 'tailwind-merge'],
+            'supabase-vendor': ['@supabase/supabase-js', '@supabase/ssr'],
+            'charts-vendor': ['recharts'],
+            'forms-vendor': ['react-hook-form'],
+            'maps-vendor': ['leaflet'],
+            'icons-vendor': ['lucide-react']
+          }
+        }
+      },
+      chunkSizeWarningLimit: 1000,
+      sourcemap: mode === 'analyze'
     },
     server: {
       port: 3000,
       open: true,
     },
-  });
+    // Performance optimizations
+    optimizeDeps: {
+      include: [
+        'react',
+        'react-dom',
+        '@supabase/supabase-js',
+        'lucide-react',
+        'clsx',
+        'tailwind-merge'
+      ]
+    },
+    esbuild: {
+      target: 'esnext',
+      minifyIdentifiers: true,
+      minifySyntax: true,
+      minifyWhitespace: true
+    }
+  }));

@@ -1,23 +1,26 @@
-import { useState, useEffect } from "react";
-import { LandingPage } from "./components/LandingPage";
-import { AuthPage } from "./components/AuthPage";
-import { Sidebar } from "./components/Sidebar";
-import { Header } from "./components/Header";
-import { Dashboard } from "./components/Dashboard";
-import { FindRide } from "./components/FindRide";
-import { OfferRide } from "./components/OfferRide";
-import { MyTrips } from "./components/MyTrips";
-import { Messages } from "./components/Messages";
-import { Payments } from "./components/Payments";
-import { Settings } from "./components/Settings";
-import { UserProfile } from "./components/UserProfile";
-import { NotificationCenter } from "./components/NotificationCenter";
-import { SafetyCenter } from "./components/SafetyCenter";
-import { TripAnalytics } from "./components/TripAnalytics";
-import { RecurringTrips } from "./components/RecurringTrips";
-import { VerificationCenter } from "./components/VerificationCenter";
-import { Toaster } from "./components/ui/sonner";
+import { useState, useEffect, Suspense, lazy } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { Toaster } from "./components/ui/sonner";
+import { PageLoadingFallback, ComponentLoadingFallback } from "./components/LoadingSpinner";
+
+// Lazy load all major components
+const LandingPage = lazy(() => import("./components/LandingPage"));
+const AuthPage = lazy(() => import("./components/AuthPage"));
+const Sidebar = lazy(() => import("./components/Sidebar"));
+const Header = lazy(() => import("./components/Header"));
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const FindRide = lazy(() => import("./components/FindRide"));
+const OfferRide = lazy(() => import("./components/OfferRide"));
+const MyTrips = lazy(() => import("./components/MyTrips"));
+const Messages = lazy(() => import("./components/Messages"));
+const Payments = lazy(() => import("./components/Payments"));
+const Settings = lazy(() => import("./components/Settings"));
+const UserProfile = lazy(() => import("./components/UserProfile"));
+const NotificationCenter = lazy(() => import("./components/NotificationCenter"));
+const SafetyCenter = lazy(() => import("./components/SafetyCenter"));
+const TripAnalytics = lazy(() => import("./components/TripAnalytics"));
+const RecurringTrips = lazy(() => import("./components/RecurringTrips"));
+const VerificationCenter = lazy(() => import("./components/VerificationCenter"));
 
 type AppFlow = "landing" | "auth" | "app";
 type Page =
@@ -79,27 +82,31 @@ function AppContent() {
   // Landing Page Flow
   if (appFlow === "landing") {
     return (
-      <LandingPage
-        onGetStarted={() => {
-          setAuthMode("signup");
-          setAppFlow("auth");
-        }}
-        onLogin={() => {
-          setAuthMode("login");
-          setAppFlow("auth");
-        }}
-      />
+      <Suspense fallback={<PageLoadingFallback />}>
+        <LandingPage
+          onGetStarted={() => {
+            setAuthMode("signup");
+            setAppFlow("auth");
+          }}
+          onLogin={() => {
+            setAuthMode("login");
+            setAppFlow("auth");
+          }}
+        />
+      </Suspense>
     );
   }
 
   // Authentication Flow
   if (appFlow === "auth") {
     return (
-      <AuthPage
-        initialTab={authMode}
-        onSuccess={() => setAppFlow("app")}
-        onBack={() => setAppFlow("landing")}
-      />
+      <Suspense fallback={<PageLoadingFallback />}>
+        <AuthPage
+          initialTab={authMode}
+          onSuccess={() => setAppFlow("app")}
+          onBack={() => setAppFlow("landing")}
+        />
+      </Suspense>
     );
   }
 
@@ -107,50 +114,110 @@ function AppContent() {
   const renderPage = () => {
     switch (currentPage) {
       case "dashboard":
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <Dashboard onNavigate={setCurrentPage} />
+          </Suspense>
+        );
       case "find-ride":
-        return <FindRide />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <FindRide />
+          </Suspense>
+        );
       case "offer-ride":
-        return <OfferRide />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <OfferRide />
+          </Suspense>
+        );
       case "my-trips":
-        return <MyTrips />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <MyTrips />
+          </Suspense>
+        );
       case "messages":
-        return <Messages />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <Messages />
+          </Suspense>
+        );
       case "payments":
-        return <Payments />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <Payments />
+          </Suspense>
+        );
       case "settings":
-        return <Settings />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <Settings />
+          </Suspense>
+        );
       case "profile":
-        return <UserProfile />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <UserProfile />
+          </Suspense>
+        );
       case "notifications":
-        return <NotificationCenter />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <NotificationCenter />
+          </Suspense>
+        );
       case "safety":
-        return <SafetyCenter />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <SafetyCenter />
+          </Suspense>
+        );
       case "analytics":
-        return <TripAnalytics />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <TripAnalytics />
+          </Suspense>
+        );
       case "recurring":
-        return <RecurringTrips />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <RecurringTrips />
+          </Suspense>
+        );
       case "verification":
-        return <VerificationCenter />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <VerificationCenter />
+          </Suspense>
+        );
       default:
-        return <Dashboard onNavigate={setCurrentPage} />;
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <Dashboard onNavigate={setCurrentPage} />
+          </Suspense>
+        );
     }
   };
 
   return (
     <>
       <div className="h-screen flex bg-gray-50">
-        <Sidebar
-          currentPage={currentPage}
-          onNavigate={setCurrentPage}
-          isOpen={isSidebarOpen}
-          onClose={() => setIsSidebarOpen(false)}
-        />
-        <div className="flex-1 flex flex-col min-w-0">
-          <Header
-            onMenuClick={() => setIsSidebarOpen(true)}
+        <Suspense fallback={<div className="w-64 bg-gray-100 animate-pulse" />}>
+          <Sidebar
+            currentPage={currentPage}
             onNavigate={setCurrentPage}
+            isOpen={isSidebarOpen}
+            onClose={() => setIsSidebarOpen(false)}
           />
+        </Suspense>
+        <div className="flex-1 flex flex-col min-w-0">
+          <Suspense fallback={<div className="h-16 bg-gray-100 animate-pulse" />}>
+            <Header
+              onMenuClick={() => setIsSidebarOpen(true)}
+              onNavigate={setCurrentPage}
+            />
+          </Suspense>
           <main className="flex-1 overflow-auto p-6 lg:p-8">{renderPage()}</main>
         </div>
       </div>
