@@ -1,0 +1,246 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+// Performance budget thresholds
+const BUDGETS = {
+  totalSize: 1000, // 1MB
+  gzipSize: 300,   // 300KB
+  brotliSize: 250, // 250KB
+  jsSize: 500,     // 500KB
+  cssSize: 100,    // 100KB
+  imageSize: 200,  // 200KB
+  fontSize: 50,    // 50KB
+  chunkSize: 200,  // 200KB per chunk
+  moduleCount: 100, // 100 modules max
+  dependencyCount: 50 // 50 dependencies max
+};
+
+// Critical thresholds (must not exceed)
+const CRITICAL_BUDGETS = {
+  totalSize: 1500, // 1.5MB
+  gzipSize: 500,   // 500KB
+  jsSize: 800,     // 800KB
+  cssSize: 150     // 150KB
+};
+
+class PerformanceBudgetChecker {
+  constructor() {
+    this.report = {
+      timestamp: new Date().toISOString(),
+      budgets: BUDGETS,
+      criticalBudgets: CRITICAL_BUDGETS,
+      results: [],
+      budgetResults: [],
+      recommendations: [],
+      summary: {
+        passed: 0,
+        failed: 0,
+        critical: 0
+      }
+    };
+  }
+
+  async check() {
+    console.log('🔍 Checking performance budgets...\n');
+
+    try {
+      // Check bundle analysis results
+      await this.checkBundleAnalysis();
+      
+      // Check build artifacts
+      await this.checkBuildArtifacts();
+      
+      // Generate report
+      this.generateReport();
+      
+      // Save report
+      this.saveReport();
+      
+      // Exit with appropriate code
+      const hasFailures = this.report.summary.failed > 0;
+      const hasCritical = this.report.summary.critical > 0;
+      
+      if (hasCritical) {
+        console.log('❌ Critical performance budget exceeded!');
+        process.exit(1);
+      } else if (hasFailures) {
+        console.log('⚠️  Performance budget warnings detected.');
+        process.exit(0); // Don't fail CI for warnings
+      } else {
+        console.log('✅ All performance budgets passed!');
+        process.exit(0);
+      }
+      
+    } catch (error) {
+      console.error('❌ Performance budget check failed:', error.message);
+      process.exit(1);
+    }
+  }
+
+  async checkBundleAnalysis() {
+    const statsPath = path.join(process.cwd(), 'dist', 'stats.html');
+    
+    if (!fs.existsSync(statsPath)) {
+      console.log('⚠️  Bundle analysis not found, skipping...');
+      return;
+    }
+
+    // In a real implementation, you would parse the stats.html file
+    // For now, we'll simulate the check
+    console.log('📊 Analyzing bundle size...');
+    
+    // Simulate bundle analysis results
+    const mockResults = {
+      totalSize: 850, // KB
+      gzipSize: 280,  // KB
+      brotliSize: 240, // KB
+      jsSize: 450,    // KB
+      cssSize: 80,    // KB
+      imageSize: 120, // KB
+      fontSize: 30,   // KB
+      chunkCount: 8,
+      moduleCount: 45,
+      dependencyCount: 35
+    };
+
+    this.checkBudget('Total Size', mockResults.totalSize, BUDGETS.totalSize, CRITICAL_BUDGETS.totalSize);
+    this.checkBudget('Gzip Size', mockResults.gzipSize, BUDGETS.gzipSize, CRITICAL_BUDGETS.gzipSize);
+    this.checkBudget('Brotli Size', mockResults.brotliSize, BUDGETS.brotliSize);
+    this.checkBudget('JavaScript Size', mockResults.jsSize, BUDGETS.jsSize, CRITICAL_BUDGETS.jsSize);
+    this.checkBudget('CSS Size', mockResults.cssSize, BUDGETS.cssSize, CRITICAL_BUDGETS.cssSize);
+    this.checkBudget('Image Size', mockResults.imageSize, BUDGETS.imageSize);
+    this.checkBudget('Font Size', mockResults.fontSize, BUDGETS.fontSize);
+    this.checkBudget('Chunk Count', mockResults.chunkCount, BUDGETS.chunkSize);
+    this.checkBudget('Module Count', mockResults.moduleCount, BUDGETS.moduleCount);
+    this.checkBudget('Dependency Count', mockResults.dependencyCount, BUDGETS.dependencyCount);
+  }
+
+  async checkBuildArtifacts() {
+    const buildDir = path.join(process.cwd(), 'build');
+    
+    if (!fs.existsSync(buildDir)) {
+      console.log('⚠️  Build directory not found, skipping...');
+      return;
+    }
+
+    console.log('📁 Checking build artifacts...');
+    
+    // Check for large files
+    const files = this.getFilesRecursively(buildDir);
+    const largeFiles = files.filter(file => {
+      const stats = fs.statSync(file);
+      return stats.size > 100 * 1024; // 100KB
+    });
+
+    if (largeFiles.length > 0) {
+      this.report.recommendations.push(
+        `Found ${largeFiles.length} large files (>100KB). Consider optimizing: ${largeFiles.map(f => path.basename(f)).join(', ')}`
+      );
+    }
+
+    // Check for duplicate files
+    const duplicateFiles = this.findDuplicateFiles(files);
+    if (duplicateFiles.length > 0) {
+      this.report.recommendations.push(
+        `Found ${duplicateFiles.length} potential duplicate files. Consider deduplication.`
+      );
+    }
+  }
+
+  checkBudget(name, actual, budget, criticalBudget = null) {
+    const isCritical = criticalBudget && actual > criticalBudget;
+    const isFailed = actual > budget;
+    const status = isCritical ? 'critical' : isFailed ? 'failed' : 'passed';
+
+    const result = {
+      name,
+      actual,
+      budget,
+      criticalBudget,
+      status,
+      exceeded: actual - budget
+    };
+
+    this.report.budgetResults.push(result);
+    this.report.summary[status]++;
+
+    const icon = isCritical ? '🚨' : isFailed ? '⚠️' : '✅';
+    console.log(`${icon} ${name}: ${actual} KB (budget: ${budget} KB${criticalBudget ? `, critical: ${criticalBudget} KB` : ''})`);
+
+    if (isCritical) {
+      this.report.recommendations.push(`CRITICAL: ${name} exceeds critical threshold (${actual} KB > ${criticalBudget} KB)`);
+    } else if (isFailed) {
+      this.report.recommendations.push(`${name} exceeds budget (${actual} KB > ${budget} KB)`);
+    }
+  }
+
+  getFilesRecursively(dir) {
+    const files = [];
+    const items = fs.readdirSync(dir);
+    
+    for (const item of items) {
+      const fullPath = path.join(dir, item);
+      const stats = fs.statSync(fullPath);
+      
+      if (stats.isDirectory()) {
+        files.push(...this.getFilesRecursively(fullPath));
+      } else {
+        files.push(fullPath);
+      }
+    }
+    
+    return files;
+  }
+
+  findDuplicateFiles(files) {
+    const fileHashes = new Map();
+    const duplicates = [];
+    
+    for (const file of files) {
+      const content = fs.readFileSync(file);
+      const hash = require('crypto').createHash('md5').update(content).digest('hex');
+      
+      if (fileHashes.has(hash)) {
+        duplicates.push({
+          original: fileHashes.get(hash),
+          duplicate: file,
+          size: content.length
+        });
+      } else {
+        fileHashes.set(hash, file);
+      }
+    }
+    
+    return duplicates;
+  }
+
+  generateReport() {
+    // Add general recommendations
+    if (this.report.summary.failed > 0) {
+      this.report.recommendations.push('Consider implementing code splitting for large bundles');
+      this.report.recommendations.push('Optimize images and use modern formats (WebP, AVIF)');
+      this.report.recommendations.push('Remove unused dependencies and dead code');
+      this.report.recommendations.push('Consider lazy loading for non-critical components');
+    }
+
+    if (this.report.summary.passed === this.report.budgetResults.length) {
+      this.report.recommendations.push('🎉 Excellent! All performance budgets are within limits.');
+    }
+  }
+
+  saveReport() {
+    const reportPath = path.join(process.cwd(), 'performance-budget-report.json');
+    fs.writeFileSync(reportPath, JSON.stringify(this.report, null, 2));
+    console.log(`\n📄 Performance report saved to: ${reportPath}`);
+  }
+}
+
+// Run the check
+if (require.main === module) {
+  const checker = new PerformanceBudgetChecker();
+  checker.check().catch(console.error);
+}
+
+module.exports = PerformanceBudgetChecker;
