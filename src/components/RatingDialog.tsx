@@ -12,6 +12,7 @@ import { Label } from './ui/label';
 import { Avatar } from './ui/avatar';
 import { Star, ThumbsUp, MessageSquare, Clock, Car, User } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
+import { logInfo } from '../utils/logger';
 
 interface RatingDialogProps {
   open: boolean;
@@ -85,12 +86,12 @@ export function RatingDialog({ open, onOpenChange, trip }: RatingDialogProps) {
       return;
     }
 
-    // Submit rating
-    console.log({
+    // Submit rating (placeholder)
+    logInfo('rating_submitted', {
       tripId: trip.id,
       overallRating,
       categories,
-      comment,
+      commentLength: comment.length,
       quickTags
     });
 

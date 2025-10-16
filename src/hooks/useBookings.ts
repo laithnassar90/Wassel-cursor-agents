@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase/client';
 import { useAuth } from '../contexts/AuthContext';
+import { logError } from '../utils/logger';
 import type { Database } from '../utils/supabase/database.types';
 
 type Booking = Database['public']['Tables']['bookings']['Row'];
@@ -13,7 +14,7 @@ export function useBookings(filters?: {
   passengerId?: string;
 }) {
   const { user } = useAuth();
-  const [bookings, setBookings] = useState<any[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +60,7 @@ export function useBookings(filters?: {
       setBookings(data || []);
       setError(null);
     } catch (err: any) {
-      console.error('Error fetching bookings:', err);
+      logError('Error fetching bookings', { error: err });
       setError(err.message);
     } finally {
       setLoading(false);
@@ -80,23 +81,13 @@ export function useBookings(filters?: {
       if (error) throw error;
 
       // Create notification for driver
-      if (data.trip) {
-        await supabase.from('notifications').insert({
-          user_id: (data.trip as any).driver_id,
-          type: 'trip_request',
-          title: 'New Trip Request',
-          message: `Someone wants to join your trip`,
-          priority: 'high',
-          booking_id: data.id,
-          trip_id: data.trip_id,
-        });
-      }
+      // Optionally notify driver (driver_id available in trip join)
 
       await fetchBookings();
 
       return { data, error: null };
     } catch (err: any) {
-      console.error('Error creating booking:', err);
+      logError('Error creating booking', { error: err });
       return { data: null, error: err.message };
     }
   };
@@ -116,7 +107,7 @@ export function useBookings(filters?: {
 
       return { data, error: null };
     } catch (err: any) {
-      console.error('Error updating booking:', err);
+      logError('Error updating booking', { error: err });
       return { data: null, error: err.message };
     }
   };

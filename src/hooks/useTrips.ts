@@ -1,10 +1,17 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../utils/supabase/client';
+import { logError } from '../utils/logger';
 import type { Database } from '../utils/supabase/database.types';
 
 type Trip = Database['public']['Tables']['trips']['Row'];
 type TripInsert = Database['public']['Tables']['trips']['Insert'];
 type TripUpdate = Database['public']['Tables']['trips']['Update'];
+type SearchTripResult = {
+  trip_id: string;
+  driver_name: string;
+  distance_from_km: number;
+  distance_to_km: number;
+};
 
 export function useTrips(filters?: {
   status?: string[];
@@ -63,7 +70,7 @@ export function useTrips(filters?: {
       setTrips(data || []);
       setError(null);
     } catch (err: any) {
-      console.error('Error fetching trips:', err);
+      logError('Error fetching trips', { error: err });
       setError(err.message);
     } finally {
       setLoading(false);
@@ -85,7 +92,7 @@ export function useTrips(filters?: {
 
       return { data, error: null };
     } catch (err: any) {
-      console.error('Error creating trip:', err);
+      logError('Error creating trip', { error: err });
       return { data: null, error: err.message };
     }
   };
@@ -106,7 +113,7 @@ export function useTrips(filters?: {
 
       return { data, error: null };
     } catch (err: any) {
-      console.error('Error updating trip:', err);
+      logError('Error updating trip', { error: err });
       return { data: null, error: err.message };
     }
   };
@@ -125,7 +132,7 @@ export function useTrips(filters?: {
 
       return { error: null };
     } catch (err: any) {
-      console.error('Error deleting trip:', err);
+      logError('Error deleting trip', { error: err });
       return { error: err.message };
     }
   };
@@ -158,7 +165,7 @@ export function useSearchTrips(searchParams: {
   departureDate?: string;
   maxDistance?: number;
 }) {
-  const [trips, setTrips] = useState<any[]>([]);
+  const [trips, setTrips] = useState<SearchTripResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -177,10 +184,10 @@ export function useSearchTrips(searchParams: {
 
       if (searchError) throw searchError;
 
-      setTrips(data || []);
+      setTrips((data as SearchTripResult[]) || []);
       setError(null);
     } catch (err: any) {
-      console.error('Error searching trips:', err);
+      logError('Error searching trips', { error: err });
       setError(err.message);
     } finally {
       setLoading(false);
@@ -197,7 +204,7 @@ export function useSearchTrips(searchParams: {
 
 // Hook for a single trip with real-time updates
 export function useTrip(tripId: string | null) {
-  const [trip, setTrip] = useState<any>(null);
+  const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -261,7 +268,7 @@ export function useTrip(tripId: string | null) {
       setTrip(data);
       setError(null);
     } catch (err: any) {
-      console.error('Error fetching trip:', err);
+      logError('Error fetching trip', { error: err });
       setError(err.message);
     } finally {
       setLoading(false);
