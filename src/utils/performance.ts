@@ -1,6 +1,6 @@
 // Performance monitoring utilities using Web Vitals
 
-import { getCLS, getFID, getFCP, getLCP, getTTFB, type Metric } from 'web-vitals';
+import { onCLS, onFID, onFCP, onLCP, onTTFB, type Metric } from 'web-vitals';
 
 export interface PerformanceMetrics {
   // Core Web Vitals
@@ -105,31 +105,31 @@ export class PerformanceMonitor {
 
   private monitorWebVitals(): void {
     // Cumulative Layout Shift
-    getCLS((metric) => {
+    onCLS((metric) => {
       this.metrics.CLS = metric.value;
       this.reportMetric('CLS', metric);
     }, { reportAllChanges: true });
 
     // First Input Delay
-    getFID((metric) => {
+    onFID((metric) => {
       this.metrics.FID = metric.value;
       this.reportMetric('FID', metric);
     });
 
     // Largest Contentful Paint
-    getLCP((metric) => {
+    onLCP((metric) => {
       this.metrics.LCP = metric.value;
       this.reportMetric('LCP', metric);
     }, { reportAllChanges: true });
 
     // First Contentful Paint
-    getFCP((metric) => {
+    onFCP((metric) => {
       this.metrics.FCP = metric.value;
       this.reportMetric('FCP', metric);
     });
 
     // Time to First Byte
-    getTTFB((metric) => {
+    onTTFB((metric) => {
       this.metrics.TTFB = metric.value;
       this.reportMetric('TTFB', metric);
     });

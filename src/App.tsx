@@ -4,7 +4,7 @@ import { Toaster } from "./components/ui/sonner";
 import { PageLoadingFallback, ComponentLoadingFallback } from "./components/LoadingSpinner";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
-// Lazy load all major components
+// Lazy load all major components with more specific chunks
 const LandingPage = lazy(() => import("./components/LandingPage"));
 const AuthPage = lazy(() => import("./components/AuthPage"));
 const Sidebar = lazy(() => import("./components/Sidebar"));
@@ -22,6 +22,7 @@ const SafetyCenter = lazy(() => import("./components/SafetyCenter"));
 const TripAnalytics = lazy(() => import("./components/TripAnalytics"));
 const RecurringTrips = lazy(() => import("./components/RecurringTrips"));
 const VerificationCenter = lazy(() => import("./components/VerificationCenter"));
+const PerformanceDashboard = lazy(() => import("./components/PerformanceDashboard"));
 
 type AppFlow = "landing" | "auth" | "app";
 type Page =
@@ -37,7 +38,8 @@ type Page =
   | "safety"
   | "analytics"
   | "recurring"
-  | "verification";
+  | "verification"
+  | "performance";
 
 function AppContent() {
   const { user, loading, isBackendConnected } = useAuth();
@@ -190,6 +192,12 @@ function AppContent() {
         return (
           <Suspense fallback={<ComponentLoadingFallback />}>
             <VerificationCenter />
+          </Suspense>
+        );
+      case "performance":
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <PerformanceDashboard />
           </Suspense>
         );
       default:

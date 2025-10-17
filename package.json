@@ -86,20 +86,7 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:lighthouse": "playwright test tests/performance/lighthouse.spec.ts",
-    "test:all": "npm run test:performance && npm run test:e2e"
-    "vite": "^6.3.7",
-    "eslint": "^9.13.0",
-    "@typescript-eslint/parser": "^8.11.0",
-    "@typescript-eslint/eslint-plugin": "^8.11.0",
-    "eslint-plugin-react-hooks": "^5.0.0",
-    "eslint-plugin-react-refresh": "^0.4.12",
-    "prettier": "^3.3.3",
-    "eslint-config-prettier": "^9.1.0"
-      },
-      "scripts": {
-            "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "format": "prettier --write ."
+    "test:all": "npm run test:performance && npm run test:e2e",
+    "ci:performance": "npm run build && npm run performance:check"
       }
 }
