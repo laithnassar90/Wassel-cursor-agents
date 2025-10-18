@@ -47,7 +47,9 @@ export function ABTestComponent({ testId, children, fallback }: ABTestComponentP
 
   // Record view event
   useEffect(() => {
-    recordEvent('view', { variantId, testId });
+    if (variantId && testId) {
+      recordEvent('view', { variantId, testId });
+    }
   }, [variantId, testId, recordEvent]);
 
   return <>{children(variantId, variant.config)}</>;

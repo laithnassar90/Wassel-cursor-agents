@@ -38,7 +38,7 @@ export function ImageOptimized({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [isInView, setIsInView] = useState(priority);
-  const imgRef = useRef<HTMLImageElement>(null);
+  const imgRef = useRef<globalThis.HTMLImageElement>(null);
 
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -47,7 +47,7 @@ export function ImageOptimized({
       return;
     }
 
-    const observer = new IntersectionObserver(
+    const observer = new globalThis.IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsInView(true);

@@ -89,7 +89,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   private sendToAnalytics = (errorData: any) => {
     // Implement your analytics service here
-    fetch('/api/errors', {
+    globalThis.fetch('/api/errors', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
