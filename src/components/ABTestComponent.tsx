@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useABTest } from '../utils/abTesting';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
@@ -7,8 +7,6 @@ import { Progress } from './ui/progress';
 import { Alert, AlertDescription } from './ui/alert';
 import { 
   BarChart3, 
-  TrendingUp, 
-  Users, 
   Target, 
   CheckCircle, 
   AlertTriangle,
@@ -19,7 +17,7 @@ import {
 
 interface ABTestComponentProps {
   testId: string;
-  children: (variant: string, config: any) => React.ReactNode;
+  children: (variant: string, config: unknown) => React.ReactNode;
   fallback?: React.ReactNode;
 }
 
@@ -62,9 +60,10 @@ export function ABTestDashboard() {
 
   useEffect(() => {
     // Load tests from framework
-    const framework = require('../utils/abTesting').abTestingFramework;
-    const testList = Array.from(framework.tests.values());
-    setTests(testList);
+    import('../utils/abTesting').then(({ abTestingFramework }) => {
+      const testList = Array.from(abTestingFramework.tests.values());
+      setTests(testList);
+    });
   }, []);
 
   const getStatusIcon = (status: string) => {
@@ -203,7 +202,7 @@ function TestDetailsModal({ testId, onClose }: { testId: string; onClose: () => 
     }
 
     // Load test details
-    const framework = require('../utils/abTesting').abTestingFramework;
+    const { abTestingFramework: framework } = await import('../utils/abTesting');
     const testData = framework.getTest(testId);
     setTest(testData);
 
