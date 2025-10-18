@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Progress } from './ui/progress';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -94,13 +95,13 @@ export function AdvancedAnalytics({ userId, timeRange = 30 }: AdvancedAnalyticsP
       timestamp: new Date().toISOString()
     };
     
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const blob = new globalThis.Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = globalThis.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = `analytics-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
-    URL.revokeObjectURL(url);
+    globalThis.URL.revokeObjectURL(url);
   };
 
   const getPerformanceGrade = (score: number) => {
