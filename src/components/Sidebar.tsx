@@ -12,7 +12,8 @@ import {
   Shield,
   TrendingUp,
   Repeat,
-  CheckCircle
+  CheckCircle,
+  Activity
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { Separator } from './ui/separator';
@@ -36,6 +37,7 @@ const mainMenuItems = [
 const accountMenuItems = [
   { id: 'profile', label: 'My Profile', labelAr: 'ملفي الشخصي', icon: User },
   { id: 'analytics', label: 'Analytics', labelAr: 'التحليلات', icon: TrendingUp },
+  { id: 'performance', label: 'Performance', labelAr: 'الأداء', icon: Activity },
   { id: 'payments', label: 'Payments', labelAr: 'المدفوعات', icon: CreditCard },
   { id: 'notifications', label: 'Notifications', labelAr: 'الإشعارات', icon: Bell },
   { id: 'verification', label: 'Verification', labelAr: 'التحقق', icon: CheckCircle },

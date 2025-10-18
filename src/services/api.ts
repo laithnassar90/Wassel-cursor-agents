@@ -1,12 +1,19 @@
-import { projectId, publicAnonKey } from '../utils/supabase/info';
-import { createClient } from 'jsr:@supabase/supabase-js@2';
+import { supabase } from '../utils/supabase/client';
 
-const API_URL = `https://${projectId}.supabase.co/functions/v1/make-server-cdfdab65`;
+// Get environment variables for API configuration
+const getEnvVar = (key: string): string => {
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    return import.meta.env[key] || '';
+  }
+  return '';
+};
 
-export const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey
-);
+const SUPABASE_URL = getEnvVar('VITE_SUPABASE_URL') || 'https://ncbwummxjmsfcreagnmz.supabase.co';
+const API_URL = `${SUPABASE_URL}/functions/v1/make-server-cdfdab65`;
+const publicAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5jYnd1bW14am1zZmNyZWFnbm16Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkzODc3MDksImV4cCI6MjA3NDk2MzcwOX0.ulQqMZstbeqjxityaIpL3ySUWJgQlSi5cMgZPq1xKGY';
+
+// Export the supabase client from the utils
+export { supabase };
 
 // Store auth token in memory
 let authToken: string | null = null;

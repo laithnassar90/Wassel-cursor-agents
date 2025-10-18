@@ -22,6 +22,7 @@ const SafetyCenter = lazy(() => import("./components/SafetyCenter"));
 const TripAnalytics = lazy(() => import("./components/TripAnalytics"));
 const RecurringTrips = lazy(() => import("./components/RecurringTrips"));
 const VerificationCenter = lazy(() => import("./components/VerificationCenter"));
+const PerformanceDashboard = lazy(() => import("./components/PerformanceDashboard"));
 
 type AppFlow = "landing" | "auth" | "app";
 type Page =
@@ -37,7 +38,8 @@ type Page =
   | "safety"
   | "analytics"
   | "recurring"
-  | "verification";
+  | "verification"
+  | "performance";
 
 function AppContent() {
   const { user, loading, isBackendConnected } = useAuth();
@@ -66,7 +68,7 @@ function AppContent() {
         setAppFlow("landing");
       }
     }
-  }, [user, loading]);
+  }, [user, loading, appFlow]);
 
   // Show loading state first
   if (loading) {
@@ -190,6 +192,12 @@ function AppContent() {
         return (
           <Suspense fallback={<ComponentLoadingFallback />}>
             <VerificationCenter />
+          </Suspense>
+        );
+      case "performance":
+        return (
+          <Suspense fallback={<ComponentLoadingFallback />}>
+            <PerformanceDashboard />
           </Suspense>
         );
       default:

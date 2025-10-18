@@ -65,22 +65,61 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      minify: 'esbuild',
       rollupOptions: {
+        treeshake: true,
         output: {
-          manualChunks: {
-            // Vendor chunks
-            'react-vendor': ['react', 'react-dom'],
-            'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select'],
-            'utils-vendor': ['clsx', 'class-variance-authority', 'tailwind-merge'],
-            'supabase-vendor': ['@supabase/supabase-js', '@supabase/ssr'],
-            'charts-vendor': ['recharts'],
-            'forms-vendor': ['react-hook-form'],
-            'maps-vendor': ['leaflet'],
-            'icons-vendor': ['lucide-react']
+          manualChunks: (id) => {
+            // Vendor chunks - split more aggressively
+            if (id.includes('node_modules')) {
+              if (id.includes('react') || id.includes('react-dom')) {
+                return 'react-vendor';
+              }
+              if (id.includes('@radix-ui')) {
+                return 'ui-vendor';
+              }
+              if (id.includes('clsx') || id.includes('class-variance-authority') || id.includes('tailwind-merge')) {
+                return 'utils-vendor';
+              }
+              if (id.includes('@supabase')) {
+                return 'supabase-vendor';
+              }
+              if (id.includes('recharts')) {
+                return 'charts-vendor';
+              }
+              if (id.includes('react-hook-form')) {
+                return 'forms-vendor';
+              }
+              if (id.includes('leaflet')) {
+                return 'maps-vendor';
+              }
+              if (id.includes('lucide-react')) {
+                return 'icons-vendor';
+              }
+              if (id.includes('web-vitals')) {
+                return 'performance-vendor';
+              }
+              // Group other vendors
+              return 'vendor';
+            }
+            
+            // Split large components into separate chunks
+            if (id.includes('/components/TripAnalytics')) {
+              return 'analytics-chunk';
+            }
+            if (id.includes('/components/PerformanceDashboard')) {
+              return 'performance-chunk';
+            }
+            if (id.includes('/components/NotificationCenter')) {
+              return 'notifications-chunk';
+            }
+            if (id.includes('/components/AdvancedAnalytics')) {
+              return 'advanced-analytics-chunk';
+            }
           }
         }
       },
-      chunkSizeWarningLimit: 1000,
+      chunkSizeWarningLimit: 500,
       sourcemap: mode === 'analyze'
     },
     server: {
@@ -95,7 +134,12 @@
         '@supabase/supabase-js',
         'lucide-react',
         'clsx',
-        'tailwind-merge'
+        'tailwind-merge',
+        'web-vitals'
+      ],
+      exclude: [
+        'recharts',
+        'leaflet'
       ]
     },
     esbuild: {

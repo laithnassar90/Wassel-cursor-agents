@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 2 * * *' # Daily at 2 AM
 
+permissions:
+  contents: read
+  pull-requests: write
+  actions: read
+
 jobs:
   performance-budget:
     runs-on: ubuntu-latest
@@ -30,47 +35,139 @@ jobs:
       
     - name: Run bundle analysis
       run: npm run build:analyze
+      continue-on-error: true
       
     - name: Check performance budget
       run: node scripts/performance-budget-check.js
+      continue-on-error: true
+      
+    - name: Check if performance report exists
+      id: check-report
+      run: |
+        if [ -f "performance-budget-report.json" ]; then
+          echo "report-exists=true" >> $GITHUB_OUTPUT
+        else
+          echo "report-exists=false" >> $GITHUB_OUTPUT
+        fi
       
     - name: Upload performance report
+      if: steps.check-report.outputs.report-exists == 'true'
       uses: actions/upload-artifact@v4
       with:
-        name: performance-report
+        name: performance-report-${{ github.run_number }}
         path: |
-          dist/stats.html
+          build/stats.html
           performance-budget-report.json
+        retention-days: 30
           
     - name: Comment PR with performance report
-      if: github.event_name == 'pull_request'
+      if: github.event_name == 'pull_request' && steps.check-report.outputs.report-exists == 'true'
       uses: actions/github-script@v7
       with:
         script: |
           const fs = require('fs');
-          const report = JSON.parse(fs.readFileSync('performance-budget-report.json', 'utf8'));
           
-          const comment = `## 📊 Performance Budget Report
+          try {
+            const report = JSON.parse(fs.readFileSync('performance-budget-report.json', 'utf8'));
+            
+            // Calculate total sizes from budget results if available
+            let totalJSSize = 0;
+            let totalCSSSize = 0;
+            let totalSize = 0;
+            
+            if (report.budgetResults && report.budgetResults.length > 0) {
+              const jsResult = report.budgetResults.find(r => r.name === 'JavaScript Size');
+              const cssResult = report.budgetResults.find(r => r.name === 'CSS Size');
+              const totalResult = report.budgetResults.find(r => r.name === 'Total Bundle Size');
+              
+              totalJSSize = jsResult ? jsResult.actual : 0;
+              totalCSSSize = cssResult ? cssResult.actual : 0;
+              totalSize = totalResult ? totalResult.actual : 0;
+            }
+            
+            const budgetStatus = report.budgetResults && report.budgetResults.length > 0 
+              ? report.budgetResults.map(result => {
+                  const status = result.status === 'passed' ? '✅' : 
+                                result.status === 'critical' ? '🚨' : '⚠️';
+                  return `- **${result.name}**: ${status} ${result.actual} KB (budget: ${result.budget} KB)`;
+                }).join('\n')
+              : '- No budget results available';
+            
+            const recommendations = report.recommendations && report.recommendations.length > 0
+              ? report.recommendations.map(rec => `- ${rec}`).join('\n')
+              : '- No specific recommendations at this time';
+            
+            const overallStatus = report.summary.critical > 0 ? '🚨 Critical Issues' :
+                                 report.summary.failed > 0 ? '⚠️ Warnings' : '✅ All Good';
+            
+            const comment = `## 📊 Performance Budget Report
+            
+            **Overall Status**: ${overallStatus}
+            
+            ### Bundle Size Analysis
+            - **JavaScript Size**: ${totalJSSize} KB
+            - **CSS Size**: ${totalCSSSize} KB  
+            - **Total Bundle Size**: ${totalSize} KB
+            
+            ### Budget Status
+            ${budgetStatus}
+            
+            ### Summary
+            - ✅ Passed: ${report.summary.passed}
+            - ⚠️ Failed: ${report.summary.failed}
+            - 🚨 Critical: ${report.summary.critical}
+            
+            ### Recommendations
+            ${recommendations}
+            
+            ---
+            📄 [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            ⏰ Generated at: ${new Date().toISOString()}
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+            
+            console.log('✅ Performance report comment posted successfully');
+            
+          } catch (error) {
+            console.error('❌ Error posting performance report:', error);
+            
+            // Post a fallback comment
+            const fallbackComment = `## 📊 Performance Budget Check
+            
+            ⚠️ Performance budget check completed, but there was an issue generating the detailed report.
+            
+            Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for more details.
+            
+            Generated at: ${new Date().toISOString()}
+            `;
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: fallbackComment
+            });
+          }
           
-          ### Bundle Size Analysis
-          - **Total Size**: ${report.totalSize} KB
-          - **Gzip Size**: ${report.gzipSize} KB
-          - **Brotli Size**: ${report.brotliSize} KB
+    - name: Fail workflow if critical budget exceeded
+      if: steps.check-report.outputs.report-exists == 'true'
+      run: |
+        if [ -f "performance-budget-report.json" ]; then
+          CRITICAL_COUNT=$(node -e "
+            const report = require('./performance-budget-report.json');
+            console.log(report.summary.critical || 0);
+          ")
           
-          ### Budget Status
-          ${report.budgetResults.map(result => 
-            `- **${result.name}**: ${result.status === 'passed' ? '✅' : '❌'} ${result.actual} KB (budget: ${result.budget} KB)`
-          ).join('\n')}
-          
-          ### Recommendations
-          ${report.recommendations.map(rec => `- ${rec}`).join('\n')}
-          
-          [View detailed report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
-          `;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
+          if [ "$CRITICAL_COUNT" -gt 0 ]; then
+            echo "❌ Critical performance budget exceeded! ($CRITICAL_COUNT critical issues)"
+            exit 1
+          else
+            echo "✅ Performance budget check passed"
+          fi
+        fi

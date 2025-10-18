@@ -1,0 +1,57 @@
+{
+  "timestamp": "2025-10-18T02:36:36.675Z",
+  "budgets": {
+    "totalSize": 1500,
+    "gzipSize": 400,
+    "brotliSize": 350,
+    "jsSize": 1200,
+    "cssSize": 100,
+    "imageSize": 500,
+    "fontSize": 50,
+    "chunkSize": 300,
+    "moduleCount": 150,
+    "dependencyCount": 80
+  },
+  "criticalBudgets": {
+    "totalSize": 2000,
+    "gzipSize": 600,
+    "jsSize": 1500,
+    "cssSize": 200
+  },
+  "results": [],
+  "budgetResults": [
+    {
+      "name": "JavaScript Size",
+      "actual": 1182,
+      "budget": 1200,
+      "criticalBudget": 1500,
+      "status": "passed",
+      "exceeded": -18
+    },
+    {
+      "name": "CSS Size",
+      "actual": 62,
+      "budget": 100,
+      "criticalBudget": 200,
+      "status": "passed",
+      "exceeded": -38
+    },
+    {
+      "name": "Total Bundle Size",
+      "actual": 1244,
+      "budget": 1500,
+      "criticalBudget": 2000,
+      "status": "passed",
+      "exceeded": -256
+    }
+  ],
+  "recommendations": [
+    "Found 6 large files (>100KB). Consider optimizing: 1ccf434105a811706fd618a3b652ae052ecf47e1-CeYvY0Ya.png, charts-vendor-DxExXtrh.js, maps-vendor-DRFwPAOw.js, react-vendor-CD-VGikz.js, supabase-vendor-BZ4TDM2P.js, vendor-Gr6Ecqxn.js",
+    "🎉 Excellent! All performance budgets are within limits."
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 0,
+    "critical": 0
+  }
+}
