@@ -5,24 +5,24 @@ import { PageLoadingFallback, ComponentLoadingFallback } from "./components/Load
 import { ErrorBoundary } from "./components/ErrorBoundary";
 
 // Lazy load all major components with more specific chunks
-const LandingPage = lazy(() => import("./components/LandingPage"));
-const AuthPage = lazy(() => import("./components/AuthPage"));
-const Sidebar = lazy(() => import("./components/Sidebar"));
-const Header = lazy(() => import("./components/Header"));
-const Dashboard = lazy(() => import("./components/Dashboard"));
-const FindRide = lazy(() => import("./components/FindRide"));
-const OfferRide = lazy(() => import("./components/OfferRide"));
-const MyTrips = lazy(() => import("./components/MyTrips"));
-const Messages = lazy(() => import("./components/Messages"));
-const Payments = lazy(() => import("./components/Payments"));
-const Settings = lazy(() => import("./components/Settings"));
-const UserProfile = lazy(() => import("./components/UserProfile"));
-const NotificationCenter = lazy(() => import("./components/NotificationCenter"));
-const SafetyCenter = lazy(() => import("./components/SafetyCenter"));
-const TripAnalytics = lazy(() => import("./components/TripAnalytics"));
-const RecurringTrips = lazy(() => import("./components/RecurringTrips"));
-const VerificationCenter = lazy(() => import("./components/VerificationCenter"));
-const PerformanceDashboard = lazy(() => import("./components/PerformanceDashboard"));
+const LandingPage = lazy(() => import("./components/LandingPage").then(module => ({ default: module.LandingPage })));
+const AuthPage = lazy(() => import("./components/AuthPage").then(module => ({ default: module.AuthPage })));
+const Sidebar = lazy(() => import("./components/Sidebar").then(module => ({ default: module.Sidebar })));
+const Header = lazy(() => import("./components/Header").then(module => ({ default: module.Header })));
+const Dashboard = lazy(() => import("./components/Dashboard").then(module => ({ default: module.Dashboard })));
+const FindRide = lazy(() => import("./components/FindRide").then(module => ({ default: module.FindRide })));
+const OfferRide = lazy(() => import("./components/OfferRide").then(module => ({ default: module.OfferRide })));
+const MyTrips = lazy(() => import("./components/MyTrips").then(module => ({ default: module.MyTrips })));
+const Messages = lazy(() => import("./components/Messages").then(module => ({ default: module.Messages })));
+const Payments = lazy(() => import("./components/Payments").then(module => ({ default: module.Payments })));
+const Settings = lazy(() => import("./components/Settings").then(module => ({ default: module.Settings })));
+const UserProfile = lazy(() => import("./components/UserProfile").then(module => ({ default: module.UserProfile })));
+const NotificationCenter = lazy(() => import("./components/NotificationCenter").then(module => ({ default: module.NotificationCenter })));
+const SafetyCenter = lazy(() => import("./components/SafetyCenter").then(module => ({ default: module.SafetyCenter })));
+const TripAnalytics = lazy(() => import("./components/TripAnalytics").then(module => ({ default: module.TripAnalytics })));
+const RecurringTrips = lazy(() => import("./components/RecurringTrips").then(module => ({ default: module.RecurringTrips })));
+const VerificationCenter = lazy(() => import("./components/VerificationCenter").then(module => ({ default: module.VerificationCenter })));
+const PerformanceDashboard = lazy(() => import("./components/PerformanceDashboard").then(module => ({ default: module.PerformanceDashboard })));
 
 type AppFlow = "landing" | "auth" | "app";
 type Page =
