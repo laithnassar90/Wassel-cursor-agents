@@ -4,7 +4,8 @@ import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { WorkflowGuide } from './WorkflowGuide';
 import { Logo } from './Logo';
-import wasselLogo from 'figma:asset/wassel-logo.png';
+import wasselLogo from '@/assets/wassel-logo.png';
+
 interface DashboardProps {
   onNavigate: (page: string) => void;
 }
