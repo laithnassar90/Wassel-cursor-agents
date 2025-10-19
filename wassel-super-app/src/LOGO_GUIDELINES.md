@@ -8,8 +8,7 @@ The Wassel logo is a circular illustration featuring sustainable transportation 
 - Green trees representing eco-friendliness and sustainability
 - Blue waterways showing comprehensive coverage
 
-**Asset Location**: `figma:asset/1ccf434105a811706fd618a3b652ae052ecf47e1.png`
-
+ 
 ## Logo Component
 
 We've created a reusable `<Logo>` component for consistent implementation across the platform.
