@@ -2,7 +2,7 @@ import { ArrowRight, Users, Shield, DollarSign, Leaf, Star, MapPin } from 'lucid
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Logo } from './Logo';
-import wasselLogo from 'figma:asset/1ccf434105a811706fd618a3b652ae052ecf47e1.png';
+import wasselLogo from '@/assets/wassel-logo.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;
