@@ -8,7 +8,7 @@ The Wassel logo is a circular illustration featuring sustainable transportation 
 - Green trees representing eco-friendliness and sustainability
 - Blue waterways showing comprehensive coverage
 
-**Asset Location**: `figma:asset/1ccf434105a811706fd618a3b652ae052ecf47e1.png`
+**Asset Location**: `figma:asset/wassel-logo.png`
 
 ## Logo Component
 
@@ -198,7 +198,7 @@ The Wassel color palette follows the **60-30-10 rule**:
 
 ### Import Statement
 ```tsx
-import wasselLogo from 'figma:asset/1ccf434105a811706fd618a3b652ae052ecf47e1.png';
+import wasselLogo from 'figma:asset/wassel-logo.png';
 ```
 
 ### Direct Usage (when Logo component not suitable)
