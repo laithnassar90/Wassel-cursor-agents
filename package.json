@@ -84,7 +84,7 @@
     "lint": "eslint 'src/**/*.{ts,tsx}'",
     "format": "prettier --write .",
     "bundle-analyze": "npm run build:analyze && npx vite-bundle-analyzer dist/stats.html",
-    "performance:check": "node scripts/performance-budget-check.js",
+    "performance:check": "node scripts/performance-budget-check.cjs",
     "performance:budget": "npm run build && npm run performance:check",
     "test:performance": "npm run build && npm run performance:check && npm run bundle-analyze",
     "test:e2e": "playwright test",

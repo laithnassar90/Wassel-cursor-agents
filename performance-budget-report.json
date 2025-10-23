@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-18T02:36:36.675Z",
+  "timestamp": "2025-10-23T23:53:58.141Z",
   "budgets": {
     "totalSize": 1500,
     "gzipSize": 400,
@@ -22,11 +22,11 @@
   "budgetResults": [
     {
       "name": "JavaScript Size",
-      "actual": 1182,
+      "actual": 1167,
       "budget": 1200,
       "criticalBudget": 1500,
       "status": "passed",
-      "exceeded": -18
+      "exceeded": -33
     },
     {
       "name": "CSS Size",
@@ -38,15 +38,15 @@
     },
     {
       "name": "Total Bundle Size",
-      "actual": 1244,
+      "actual": 1229,
       "budget": 1500,
       "criticalBudget": 2000,
       "status": "passed",
-      "exceeded": -256
+      "exceeded": -271
     }
   ],
   "recommendations": [
-    "Found 6 large files (>100KB). Consider optimizing: 1ccf434105a811706fd618a3b652ae052ecf47e1-CeYvY0Ya.png, charts-vendor-DxExXtrh.js, maps-vendor-DRFwPAOw.js, react-vendor-CD-VGikz.js, supabase-vendor-BZ4TDM2P.js, vendor-Gr6Ecqxn.js",
+    "Found 5 large files (>100KB). Consider optimizing: charts-vendor-CY0gbNEE.js, maps-vendor-DCIffZry.js, react-vendor-CoAgkdNY.js, supabase-vendor-BzSBvWi4.js, wassel-logo-CeYvY0Ya.png",
     "🎉 Excellent! All performance budgets are within limits."
   ],
   "summary": {
