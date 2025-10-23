@@ -25,12 +25,20 @@ export function ABTestComponent({ testId, children, fallback }: ABTestComponentP
   const { test, variantId, assignUser, recordEvent, isAssigned } = useABTest(testId);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Ensure hooks run unconditionally and guard inside
   useEffect(() => {
     if (!isAssigned && test) {
       assignUser();
     }
     setIsLoading(false);
   }, [test, isAssigned, assignUser]);
+
+  // Record view event (guard inside effect)
+  useEffect(() => {
+    if (variantId && testId) {
+      recordEvent('view', { variantId, testId });
+    }
+  }, [variantId, testId, recordEvent]);
 
   if (isLoading) {
     return fallback || <div>Loading...</div>;
@@ -44,13 +52,6 @@ export function ABTestComponent({ testId, children, fallback }: ABTestComponentP
   if (!variant) {
     return fallback || <div>Variant not found</div>;
   }
-
-  // Record view event
-  useEffect(() => {
-    if (variantId && testId) {
-      recordEvent('view', { variantId, testId });
-    }
-  }, [variantId, testId, recordEvent]);
 
   return <>{children(variantId, variant.config)}</>;
 }
@@ -202,16 +203,18 @@ function TestDetailsModal({ testId, onClose }: { testId: string; onClose: () => 
       // Handle new test creation
       return;
     }
-
     // Load test details
-    const { abTestingFramework: framework } = await import('../utils/abTesting');
-    const testData = framework.getTest(testId);
-    setTest(testData);
+    const load = async () => {
+      const { abTestingFramework: framework } = await import('../utils/abTesting');
+      const testData = framework.getTest(testId);
+      setTest(testData);
 
-    if (testData) {
-      const analysisData = framework.analyzeTest(testId);
-      setAnalysis(analysisData);
-    }
+      if (testData) {
+        const analysisData = framework.analyzeTest(testId);
+        setAnalysis(analysisData);
+      }
+    };
+    void load();
   }, [testId]);
 
   if (!test) {
