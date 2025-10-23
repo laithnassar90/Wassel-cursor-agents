@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../utils/supabase/client';
 import { logError } from '../utils/logger';
 import type { Database } from '../utils/supabase/database.types';
@@ -13,6 +13,9 @@ type SearchTripResult = {
   distance_to_km: number;
 };
 
+/* -------------------------------------------------------------------------- */
+/*                                useTrips Hook                               */
+/* -------------------------------------------------------------------------- */
 export function useTrips(filters?: {
   status?: string[];
   driverId?: string;
@@ -31,7 +34,8 @@ export function useTrips(filters?: {
       setLoading(true);
       let query = supabase
         .from('trips')
-        .select(`
+        .select(
+          `
           *,
           driver:profiles!driver_id(
             id,
@@ -46,25 +50,16 @@ export function useTrips(filters?: {
             year
           ),
           stops:trip_stops(*)
-        `)
+        `
+        )
         .order('departure_date', { ascending: true })
         .order('departure_time', { ascending: true });
 
-      // Apply filters
-      if (filters?.status && filters.status.length > 0) {
-        query = query.in('status', filters.status);
-      }
-
-      if (filters?.driverId) {
-        query = query.eq('driver_id', filters.driverId);
-      }
-
-      if (filters?.fromDate) {
-        query = query.gte('departure_date', filters.fromDate);
-      }
+      if (filters?.status?.length) query = query.in('status', filters.status);
+      if (filters?.driverId) query = query.eq('driver_id', filters.driverId);
+      if (filters?.fromDate) query = query.gte('departure_date', filters.fromDate);
 
       const { data, error: fetchError } = await query;
-
       if (fetchError) throw fetchError;
 
       setTrips(data || []);
@@ -84,12 +79,8 @@ export function useTrips(filters?: {
         .insert(tripData)
         .select()
         .single();
-
       if (error) throw error;
-
-      // Refresh trips list
       await fetchTrips();
-
       return { data, error: null };
     } catch (err: any) {
       logError('Error creating trip', { error: err });
@@ -105,12 +96,8 @@ export function useTrips(filters?: {
         .eq('id', tripId)
         .select()
         .single();
-
       if (error) throw error;
-
-      // Refresh trips list
       await fetchTrips();
-
       return { data, error: null };
     } catch (err: any) {
       logError('Error updating trip', { error: err });
@@ -120,16 +107,9 @@ export function useTrips(filters?: {
 
   const deleteTrip = async (tripId: string) => {
     try {
-      const { error } = await supabase
-        .from('trips')
-        .delete()
-        .eq('id', tripId);
-
+      const { error } = await supabase.from('trips').delete().eq('id', tripId);
       if (error) throw error;
-
-      // Refresh trips list
       await fetchTrips();
-
       return { error: null };
     } catch (err: any) {
       logError('Error deleting trip', { error: err });
@@ -137,12 +117,11 @@ export function useTrips(filters?: {
     }
   };
 
-  const publishTrip = async (tripId: string) => {
-    return updateTrip(tripId, {
+  const publishTrip = async (tripId: string) =>
+    updateTrip(tripId, {
       status: 'published',
       published_at: new Date().toISOString(),
     });
-  };
 
   return {
     trips,
@@ -156,7 +135,9 @@ export function useTrips(filters?: {
   };
 }
 
-// Hook for searching trips
+/* -------------------------------------------------------------------------- */
+/*                              useSearchTrips Hook                           */
+/* -------------------------------------------------------------------------- */
 export function useSearchTrips(searchParams: {
   fromLat: number;
   fromLng: number;
@@ -172,18 +153,17 @@ export function useSearchTrips(searchParams: {
   const searchTrips = async () => {
     try {
       setLoading(true);
-      
       const { data, error: searchError } = await supabase.rpc('search_nearby_trips', {
         from_lat: searchParams.fromLat,
         from_lng: searchParams.fromLng,
         to_lat: searchParams.toLat,
         to_lng: searchParams.toLng,
         max_distance_km: searchParams.maxDistance || 10,
-        departure_date: searchParams.departureDate || new Date().toISOString().split('T')[0],
+        departure_date:
+          searchParams.departureDate ||
+          new Date().toISOString().split('T')[0],
       });
-
       if (searchError) throw searchError;
-
       setTrips((data as SearchTripResult[]) || []);
       setError(null);
     } catch (err: any) {
@@ -194,30 +174,31 @@ export function useSearchTrips(searchParams: {
     }
   };
 
-  return {
-    trips,
-    loading,
-    error,
-    searchTrips,
-  };
+  return { trips, loading, error, searchTrips };
 }
 
-// Hook for a single trip with real-time updates
+/* -------------------------------------------------------------------------- */
+/*                                useTrip Hook                                */
+/* -------------------------------------------------------------------------- */
 export function useTrip(tripId: string | null) {
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // ✅ Keep subscription cleanup in a ref to avoid stale closures
+  const subscriptionCleanup = useRef<(() => void) | null>(null);
+
   useEffect(() => {
+    // Always run effect; guard logic internally
     if (!tripId) {
+      setTrip(null);
       setLoading(false);
       return;
     }
 
     fetchTrip();
 
-    // Subscribe to real-time updates
-    const subscription = supabase
+    const channel = supabase
       .channel(`trip:${tripId}`)
       .on(
         'postgres_changes',
@@ -229,28 +210,27 @@ export function useTrip(tripId: string | null) {
         },
         (payload) => {
           console.log('Trip updated:', payload);
-          if (payload.eventType === 'DELETE') {
-            setTrip(null);
-          } else {
-            fetchTrip();
-          }
+          if (payload.eventType === 'DELETE') setTrip(null);
+          else fetchTrip();
         }
       )
       .subscribe();
 
+    subscriptionCleanup.current = () => channel.unsubscribe();
+
     return () => {
-      subscription.unsubscribe();
+      if (subscriptionCleanup.current) subscriptionCleanup.current();
     };
   }, [tripId]);
 
   const fetchTrip = async () => {
     if (!tripId) return;
-
     try {
       setLoading(true);
       const { data, error: fetchError } = await supabase
         .from('trips')
-        .select(`
+        .select(
+          `
           *,
           driver:profiles!driver_id(*),
           vehicle:vehicles(*),
@@ -259,12 +239,11 @@ export function useTrip(tripId: string | null) {
             *,
             passenger:profiles!passenger_id(*)
           )
-        `)
+        `
+        )
         .eq('id', tripId)
         .single();
-
       if (fetchError) throw fetchError;
-
       setTrip(data);
       setError(null);
     } catch (err: any) {
@@ -275,10 +254,5 @@ export function useTrip(tripId: string | null) {
     }
   };
 
-  return {
-    trip,
-    loading,
-    error,
-    refresh: fetchTrip,
-  };
+  return { trip, loading, error, refresh: fetchTrip };
 }
