@@ -49,6 +49,8 @@ export default [
       ...typescript.configs.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       ...reactRefresh.configs.recommended.rules,
+      // TypeScript handles undefined references; avoid false positives
+      'no-undef': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
       '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
