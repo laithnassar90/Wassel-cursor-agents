@@ -29,7 +29,7 @@ export class ErrorBoundary extends Component<Props, State> {
       hasError: false,
       error: null,
       errorInfo: null,
-      errorId: ''
+      errorId: '',
     };
   }
 
@@ -37,20 +37,13 @@ export class ErrorBoundary extends Component<Props, State> {
     return {
       hasError: true,
       error,
-      errorId: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      errorId: `error_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    this.setState({
-      error,
-      errorInfo
-    });
-
-    // Log error to monitoring service
+    this.setState({ error, errorInfo });
     this.logError(error, errorInfo);
-
-    // Call custom error handler
     this.props.onError?.(error, errorInfo);
   }
 
@@ -63,107 +56,85 @@ export class ErrorBoundary extends Component<Props, State> {
       timestamp: new Date().toISOString(),
       userAgent: navigator.userAgent,
       url: window.location.href,
-      retryCount: this.retryCount
+      retryCount: this.retryCount,
     };
 
-    // Log to console in development
     if (import.meta.env.DEV) {
-      console.error('Error Boundary caught an error:', errorData);
+      console.error('ErrorBoundary caught error:', errorData);
     }
 
-    // Send to error tracking service (Sentry, LogRocket, etc.)
+    // Google Analytics / gtag
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'exception', {
         description: error.message,
         fatal: this.props.level === 'critical',
         custom_map: {
           error_id: this.state.errorId,
-          component_stack: errorInfo.componentStack
-        }
+          component_stack: errorInfo.componentStack,
+        },
       });
     }
 
-    // Send to custom analytics
+    // Send to backend analytics
     this.sendToAnalytics(errorData);
   };
 
-  private sendToAnalytics = (errorData: any) => {
-    // Implement your analytics service here
-    globalThis.fetch('/api/errors', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(errorData)
-    }).catch(() => {
-      // Silently fail if analytics service is unavailable
-    });
+  private sendToAnalytics = async (errorData: any) => {
+    try {
+      await fetch('/api/errors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(errorData),
+      });
+    } catch (e) {
+      if (import.meta.env.DEV) {
+        console.warn('Failed to send error to analytics:', e);
+      }
+    }
   };
 
   private handleRetry = () => {
     if (this.retryCount < this.maxRetries) {
       this.retryCount++;
-      this.setState({
-        hasError: false,
-        error: null,
-        errorInfo: null,
-        errorId: ''
-      });
+      this.setState({ hasError: false, error: null, errorInfo: null, errorId: '' });
     }
   };
 
-  private handleReload = () => {
-    window.location.reload();
-  };
-
-  private handleGoHome = () => {
-    window.location.href = '/';
-  };
+  private handleReload = () => window.location.reload();
+  private handleGoHome = () => (window.location.href = '/');
 
   private handleReportBug = () => {
     const errorData = {
       errorId: this.state.errorId,
-      error: this.state.error?.message,
+      message: this.state.error?.message,
       stack: this.state.error?.stack,
       componentStack: this.state.errorInfo?.componentStack,
       url: window.location.href,
       userAgent: navigator.userAgent,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     };
-
-    // Open bug report with pre-filled data
     const bugReportUrl = `mailto:support@wassel.com?subject=Bug Report - ${this.state.errorId}&body=${encodeURIComponent(JSON.stringify(errorData, null, 2))}`;
     window.open(bugReportUrl);
   };
 
   render() {
     if (this.state.hasError) {
-      // Use custom fallback if provided
-      if (this.props.fallback) {
-        return this.props.fallback;
-      }
-
-      // Default error UI based on level
-      return this.renderErrorUI();
+      return this.props.fallback || this.renderErrorUI();
     }
-
     return this.props.children;
   }
 
   private renderErrorUI() {
     const { level = 'component', showDetails = import.meta.env.DEV } = this.props;
-    const { error, errorInfo, errorId } = this.state;
 
-    if (level === 'critical') {
-      return this.renderCriticalError();
+    switch (level) {
+      case 'critical': return this.renderCriticalError();
+      case 'page': return this.renderPageError();
+      default: return this.renderComponentError();
     }
-
-    if (level === 'page') {
-      return this.renderPageError();
-    }
-
-    return this.renderComponentError();
   }
+
+  // ------------------ UI Renders ------------------
 
   private renderCriticalError() {
     return (
@@ -175,29 +146,18 @@ export class ErrorBoundary extends Component<Props, State> {
             </div>
             <CardTitle className="text-red-900">Critical Error</CardTitle>
             <CardDescription>
-              Something went wrong and we couldn't recover. Please refresh the page.
+              Something went wrong. Please refresh the page.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="text-center">
-              <p className="text-sm text-gray-600 mb-4">
-                Error ID: <code className="bg-gray-100 px-2 py-1 rounded text-xs">{this.state.errorId}</code>
-              </p>
-            </div>
+            <p className="text-sm text-gray-600 text-center mb-4">
+              Error ID: <code className="bg-gray-100 px-2 py-1 rounded text-xs">{this.state.errorId}</code>
+            </p>
             <div className="flex gap-2">
-              <Button onClick={this.handleReload} className="flex-1">
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Refresh Page
-              </Button>
-              <Button variant="outline" onClick={this.handleGoHome} className="flex-1">
-                <Home className="h-4 w-4 mr-2" />
-                Go Home
-              </Button>
+              <Button onClick={this.handleReload} className="flex-1"><RefreshCw className="h-4 w-4 mr-2" />Refresh Page</Button>
+              <Button variant="outline" onClick={this.handleGoHome} className="flex-1"><Home className="h-4 w-4 mr-2" />Go Home</Button>
             </div>
-            <Button variant="ghost" onClick={this.handleReportBug} className="w-full">
-              <Bug className="h-4 w-4 mr-2" />
-              Report Bug
-            </Button>
+            <Button variant="ghost" onClick={this.handleReportBug} className="w-full"><Bug className="h-4 w-4 mr-2" />Report Bug</Button>
           </CardContent>
         </Card>
       </div>
@@ -205,43 +165,24 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private renderPageError() {
+    const { showDetails } = this.props;
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
         <Card className="w-full max-w-lg">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Page Error
-            </CardTitle>
-            <CardDescription>
-              This page encountered an error and couldn't load properly.
-            </CardDescription>
+            <CardTitle className="flex items-center gap-2"><AlertTriangle className="h-5 w-5 text-orange-500" />Page Error</CardTitle>
+            <CardDescription>This page encountered an error and couldn't load properly.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Alert>
-              <AlertTriangle className="h-4 w-4" />
-              <AlertDescription>
-                Error ID: <code className="bg-gray-100 px-1 rounded">{this.state.errorId}</code>
-              </AlertDescription>
-            </Alert>
-            
+            <Alert><AlertTriangle className="h-4 w-4" /><AlertDescription>Error ID: <code className="bg-gray-100 px-1 rounded">{this.state.errorId}</code></AlertDescription></Alert>
             <div className="flex gap-2">
-              <Button onClick={this.handleRetry} disabled={this.retryCount >= this.maxRetries}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Try Again {this.retryCount > 0 && `(${this.retryCount}/${this.maxRetries})`}
-              </Button>
-              <Button variant="outline" onClick={this.handleGoHome}>
-                <Home className="h-4 w-4 mr-2" />
-                Go Home
-              </Button>
+              <Button onClick={this.handleRetry} disabled={this.retryCount >= this.maxRetries}><RefreshCw className="h-4 w-4 mr-2" />Try Again {this.retryCount > 0 && `(${this.retryCount}/${this.maxRetries})`}</Button>
+              <Button variant="outline" onClick={this.handleGoHome}><Home className="h-4 w-4 mr-2" />Go Home</Button>
             </div>
-
-            {this.props.showDetails && this.state.error && (
+            {showDetails && this.state.error && (
               <details className="mt-4">
                 <summary className="cursor-pointer text-sm font-medium">Error Details</summary>
-                <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">
-                  {this.state.error.stack}
-                </pre>
+                <pre className="mt-2 text-xs bg-gray-100 p-2 rounded overflow-auto">{this.state.error.stack}</pre>
               </details>
             )}
           </CardContent>
@@ -251,6 +192,7 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   private renderComponentError() {
+    const { showDetails } = this.props;
     return (
       <div className="p-4 border border-red-200 rounded-lg bg-red-50">
         <div className="flex items-start gap-3">
@@ -260,20 +202,13 @@ export class ErrorBoundary extends Component<Props, State> {
             <p className="text-sm text-red-700 mt-1">
               This component failed to load. 
               {this.retryCount < this.maxRetries && (
-                <button
-                  onClick={this.handleRetry}
-                  className="ml-2 text-red-600 hover:text-red-800 underline"
-                >
-                  Try again
-                </button>
+                <button onClick={this.handleRetry} className="ml-2 text-red-600 hover:text-red-800 underline">Try again</button>
               )}
             </p>
-            {this.props.showDetails && this.state.error && (
+            {showDetails && this.state.error && (
               <details className="mt-2">
                 <summary className="cursor-pointer text-xs text-red-600">Show details</summary>
-                <pre className="mt-1 text-xs bg-red-100 p-2 rounded overflow-auto">
-                  {this.state.error.message}
-                </pre>
+                <pre className="mt-1 text-xs bg-red-100 p-2 rounded overflow-auto">{this.state.error.message}</pre>
               </details>
             )}
           </div>
@@ -283,7 +218,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-// HOC for easier error boundary usage
+// ------------------ HOC & Hook ------------------
+
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   errorBoundaryProps?: Omit<Props, 'children'>
@@ -293,17 +229,28 @@ export function withErrorBoundary<P extends object>(
       <Component {...props} />
     </ErrorBoundary>
   );
-
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
   return WrappedComponent;
 }
 
-// Hook for error boundary context
 export function useErrorHandler() {
   return {
     reportError: (error: Error, context?: string) => {
       console.error('Manual error report:', { error, context });
-      // Implement manual error reporting
-    }
+      if (typeof window !== 'undefined') {
+        fetch('/api/errors', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: error.message,
+            stack: error.stack,
+            context,
+            timestamp: new Date().toISOString(),
+            userAgent: navigator.userAgent,
+            url: window.location.href,
+          }),
+        }).catch(() => {});
+      }
+    },
   };
 }
