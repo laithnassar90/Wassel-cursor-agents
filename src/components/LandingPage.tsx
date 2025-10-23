@@ -1,13 +1,31 @@
-import { ArrowRight, Users, Shield, DollarSign, Leaf, Star, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent } from './ui/card';
 import { Logo } from './Logo';
-import wasselLogo from '@/assets/wassel-logo.png'; // fixed import
+import wasselLogo from '@/assets/wassel-logo.png';
 
 interface LandingPageProps {
   onGetStarted: () => void;
   onLogin: () => void;
 }
+
+const testimonials = [
+  {
+    quote: "Wassel saved me over 60% on my weekly commute from Dubai to Abu Dhabi. The drivers are professional and friendly!",
+    author: "Ahmed K.",
+    route: "Dubai → Abu Dhabi"
+  },
+  {
+    quote: "I love the Raje3 feature! It makes planning return trips so much easier and more affordable.",
+    author: "Sarah M.",
+    route: "Riyadh → Jeddah"
+  },
+  {
+    quote: "Safe, reliable, and eco-friendly. Wassel is exactly what the Middle East needed for modern travel.",
+    author: "Omar A.",
+    route: "Cairo → Alexandria"
+  }
+];
 
 export function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
   return (
@@ -69,6 +87,7 @@ export function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
               </div>
             </div>
           </div>
+
           <div className="relative">
             <div className="bg-gradient-to-br from-primary/80 to-primary rounded-3xl p-12 shadow-2xl flex items-center justify-center">
               <img src={wasselLogo} alt="Wassel Platform" className="w-64 h-auto" />
@@ -81,26 +100,21 @@ export function LandingPage({ onGetStarted, onLogin }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Features Section */}
-      {/* ...rest of your code remains unchanged, just make sure any `wassel-logo` references are replaced with `wasselLogo` */}
+      {/* Testimonials Section */}
+      <section className="max-w-7xl mx-auto px-6 py-20 bg-gray-50" id="how-it-works">
+        <h2 className="text-4xl font-semibold text-center mb-12">What Our Users Say</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          {testimonials.map((t, idx) => (
+            <Card key={idx} className="p-6">
+              <CardContent>
+                <p className="text-gray-700 italic">"{t.quote}"</p>
+                <p className="mt-4 font-semibold text-gray-900">{t.author}</p>
+                <p className="text-sm text-gray-500">{t.route}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
-
-const testimonials = [
-  {
-    quote: "Wassel saved me over 60% on my weekly commute from Dubai to Abu Dhabi. The drivers are professional and friendly!",
-    author: "Ahmed K.",
-    route: "Dubai → Abu Dhabi"
-  },
-  {
-    quote: "I love the Raje3 feature! It makes planning return trips so much easier and more affordable.",
-    author: "Sarah M.",
-    route: "Riyadh → Jeddah"
-  },
-  {
-    quote: "Safe, reliable, and eco-friendly. Wassel is exactly what the Middle East needed for modern travel.",
-    author: "Omar A.",
-    route: "Cairo → Alexandria"
-  }
-];
