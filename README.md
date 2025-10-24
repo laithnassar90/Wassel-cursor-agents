@@ -1,7 +1,7 @@
 
   # Wassel Ride Sharing Platform
 
-  This is a code bundle for Wassel Ride Sharing Platform. The original project is available at https://www.figma.com/design/u5gwJvXlZRECSPbVXFolqB/Wassel-Ride-Sharing-Platform.
+  This is a code bundle for Wassel Ride Sharing Platform. The original project prototype available at https://www.figma.com/design/u5gwJvXlZRECSPbVXFolqB/Wassel-Ride-Sharing-Platform.
 
   ## Running the code
 
