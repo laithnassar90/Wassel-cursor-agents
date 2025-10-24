@@ -1,6 +1,6 @@
-<testsuites id="" name="" tests="15" failures="15" skipped="0" errors="0" time="74.597891">
-<testsuite name="performance/lighthouse.spec.ts" timestamp="2025-10-24T00:53:28.214Z" hostname="chromium" tests="3" failures="3" skipped="0" time="5.387" errors="0">
-<testcase name="Lighthouse Performance Tests › Homepage Lighthouse Audit" classname="performance/lighthouse.spec.ts" time="1.945">
+<testsuites id="" name="" tests="3" failures="3" skipped="0" errors="0" time="24.302861">
+<testsuite name="performance/lighthouse.spec.ts" timestamp="2025-10-24T02:56:23.879Z" hostname="chromium" tests="3" failures="3" skipped="0" time="5.39" errors="0">
+<testcase name="Lighthouse Performance Tests › Homepage Lighthouse Audit" classname="performance/lighthouse.spec.ts" time="1.995">
 <failure message="lighthouse.spec.ts:15:7 Homepage Lighthouse Audit" type="FAILURE">
 <![CDATA[  [chromium] › performance/lighthouse.spec.ts:15:7 › Lighthouse Performance Tests › Homepage Lighthouse Audit 
 
@@ -17,7 +17,7 @@
 ]]>
 </failure>
 </testcase>
-<testcase name="Lighthouse Performance Tests › Mobile Performance Audit" classname="performance/lighthouse.spec.ts" time="1.758">
+<testcase name="Lighthouse Performance Tests › Mobile Performance Audit" classname="performance/lighthouse.spec.ts" time="1.896">
 <failure message="lighthouse.spec.ts:70:7 Mobile Performance Audit" type="FAILURE">
 <![CDATA[  [chromium] › performance/lighthouse.spec.ts:70:7 › Lighthouse Performance Tests › Mobile Performance Audit 
 
@@ -34,221 +34,9 @@
 ]]>
 </failure>
 </testcase>
-<testcase name="Lighthouse Performance Tests › Performance Budget Validation" classname="performance/lighthouse.spec.ts" time="1.684">
+<testcase name="Lighthouse Performance Tests › Performance Budget Validation" classname="performance/lighthouse.spec.ts" time="1.499">
 <failure message="lighthouse.spec.ts:121:7 Performance Budget Validation" type="FAILURE">
 <![CDATA[  [chromium] › performance/lighthouse.spec.ts:121:7 › Lighthouse Performance Tests › Performance Budget Validation 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      128 |       
-      129 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 130 |         port: new URL(browser.wsEndpoint()).port,
-          |                               ^
-      131 |         output: 'json',
-      132 |         logLevel: 'info',
-      133 |         onlyCategories: ['performance']
-        at /workspace/tests/performance/lighthouse.spec.ts:130:31
-]]>
-</failure>
-</testcase>
-</testsuite>
-<testsuite name="performance/lighthouse.spec.ts" timestamp="2025-10-24T00:53:28.214Z" hostname="firefox" tests="3" failures="3" skipped="0" time="4.85" errors="0">
-<testcase name="Lighthouse Performance Tests › Homepage Lighthouse Audit" classname="performance/lighthouse.spec.ts" time="1.616">
-<failure message="lighthouse.spec.ts:15:7 Homepage Lighthouse Audit" type="FAILURE">
-<![CDATA[  [firefox] › performance/lighthouse.spec.ts:15:7 › Lighthouse Performance Tests › Homepage Lighthouse Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      24 |       // Run Lighthouse audit
-      25 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 26 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      27 |         output: 'json',
-      28 |         logLevel: 'info',
-      29 |         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa']
-        at /workspace/tests/performance/lighthouse.spec.ts:26:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Mobile Performance Audit" classname="performance/lighthouse.spec.ts" time="1.581">
-<failure message="lighthouse.spec.ts:70:7 Mobile Performance Audit" type="FAILURE">
-<![CDATA[  [firefox] › performance/lighthouse.spec.ts:70:7 › Lighthouse Performance Tests › Mobile Performance Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      82 |       // Run Lighthouse audit with mobile configuration
-      83 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 84 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      85 |         output: 'json',
-      86 |         logLevel: 'info',
-      87 |         onlyCategories: ['performance'],
-        at /workspace/tests/performance/lighthouse.spec.ts:84:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Performance Budget Validation" classname="performance/lighthouse.spec.ts" time="1.653">
-<failure message="lighthouse.spec.ts:121:7 Performance Budget Validation" type="FAILURE">
-<![CDATA[  [firefox] › performance/lighthouse.spec.ts:121:7 › Lighthouse Performance Tests › Performance Budget Validation 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      128 |       
-      129 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 130 |         port: new URL(browser.wsEndpoint()).port,
-          |                               ^
-      131 |         output: 'json',
-      132 |         logLevel: 'info',
-      133 |         onlyCategories: ['performance']
-        at /workspace/tests/performance/lighthouse.spec.ts:130:31
-]]>
-</failure>
-</testcase>
-</testsuite>
-<testsuite name="performance/lighthouse.spec.ts" timestamp="2025-10-24T00:53:28.214Z" hostname="webkit" tests="3" failures="3" skipped="0" time="5.308" errors="0">
-<testcase name="Lighthouse Performance Tests › Homepage Lighthouse Audit" classname="performance/lighthouse.spec.ts" time="1.904">
-<failure message="lighthouse.spec.ts:15:7 Homepage Lighthouse Audit" type="FAILURE">
-<![CDATA[  [webkit] › performance/lighthouse.spec.ts:15:7 › Lighthouse Performance Tests › Homepage Lighthouse Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      24 |       // Run Lighthouse audit
-      25 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 26 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      27 |         output: 'json',
-      28 |         logLevel: 'info',
-      29 |         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa']
-        at /workspace/tests/performance/lighthouse.spec.ts:26:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Mobile Performance Audit" classname="performance/lighthouse.spec.ts" time="1.73">
-<failure message="lighthouse.spec.ts:70:7 Mobile Performance Audit" type="FAILURE">
-<![CDATA[  [webkit] › performance/lighthouse.spec.ts:70:7 › Lighthouse Performance Tests › Mobile Performance Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      82 |       // Run Lighthouse audit with mobile configuration
-      83 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 84 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      85 |         output: 'json',
-      86 |         logLevel: 'info',
-      87 |         onlyCategories: ['performance'],
-        at /workspace/tests/performance/lighthouse.spec.ts:84:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Performance Budget Validation" classname="performance/lighthouse.spec.ts" time="1.674">
-<failure message="lighthouse.spec.ts:121:7 Performance Budget Validation" type="FAILURE">
-<![CDATA[  [webkit] › performance/lighthouse.spec.ts:121:7 › Lighthouse Performance Tests › Performance Budget Validation 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      128 |       
-      129 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 130 |         port: new URL(browser.wsEndpoint()).port,
-          |                               ^
-      131 |         output: 'json',
-      132 |         logLevel: 'info',
-      133 |         onlyCategories: ['performance']
-        at /workspace/tests/performance/lighthouse.spec.ts:130:31
-]]>
-</failure>
-</testcase>
-</testsuite>
-<testsuite name="performance/lighthouse.spec.ts" timestamp="2025-10-24T00:53:28.214Z" hostname="Mobile Chrome" tests="3" failures="3" skipped="0" time="5.302" errors="0">
-<testcase name="Lighthouse Performance Tests › Homepage Lighthouse Audit" classname="performance/lighthouse.spec.ts" time="1.844">
-<failure message="lighthouse.spec.ts:15:7 Homepage Lighthouse Audit" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › performance/lighthouse.spec.ts:15:7 › Lighthouse Performance Tests › Homepage Lighthouse Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      24 |       // Run Lighthouse audit
-      25 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 26 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      27 |         output: 'json',
-      28 |         logLevel: 'info',
-      29 |         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa']
-        at /workspace/tests/performance/lighthouse.spec.ts:26:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Mobile Performance Audit" classname="performance/lighthouse.spec.ts" time="1.766">
-<failure message="lighthouse.spec.ts:70:7 Mobile Performance Audit" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › performance/lighthouse.spec.ts:70:7 › Lighthouse Performance Tests › Mobile Performance Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      82 |       // Run Lighthouse audit with mobile configuration
-      83 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 84 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      85 |         output: 'json',
-      86 |         logLevel: 'info',
-      87 |         onlyCategories: ['performance'],
-        at /workspace/tests/performance/lighthouse.spec.ts:84:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Performance Budget Validation" classname="performance/lighthouse.spec.ts" time="1.692">
-<failure message="lighthouse.spec.ts:121:7 Performance Budget Validation" type="FAILURE">
-<![CDATA[  [Mobile Chrome] › performance/lighthouse.spec.ts:121:7 › Lighthouse Performance Tests › Performance Budget Validation 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      128 |       
-      129 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 130 |         port: new URL(browser.wsEndpoint()).port,
-          |                               ^
-      131 |         output: 'json',
-      132 |         logLevel: 'info',
-      133 |         onlyCategories: ['performance']
-        at /workspace/tests/performance/lighthouse.spec.ts:130:31
-]]>
-</failure>
-</testcase>
-</testsuite>
-<testsuite name="performance/lighthouse.spec.ts" timestamp="2025-10-24T00:53:28.214Z" hostname="Mobile Safari" tests="3" failures="3" skipped="0" time="4.531" errors="0">
-<testcase name="Lighthouse Performance Tests › Homepage Lighthouse Audit" classname="performance/lighthouse.spec.ts" time="1.553">
-<failure message="lighthouse.spec.ts:15:7 Homepage Lighthouse Audit" type="FAILURE">
-<![CDATA[  [Mobile Safari] › performance/lighthouse.spec.ts:15:7 › Lighthouse Performance Tests › Homepage Lighthouse Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      24 |       // Run Lighthouse audit
-      25 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 26 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      27 |         output: 'json',
-      28 |         logLevel: 'info',
-      29 |         onlyCategories: ['performance', 'accessibility', 'best-practices', 'seo', 'pwa']
-        at /workspace/tests/performance/lighthouse.spec.ts:26:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Mobile Performance Audit" classname="performance/lighthouse.spec.ts" time="1.551">
-<failure message="lighthouse.spec.ts:70:7 Mobile Performance Audit" type="FAILURE">
-<![CDATA[  [Mobile Safari] › performance/lighthouse.spec.ts:70:7 › Lighthouse Performance Tests › Mobile Performance Audit 
-
-    TypeError: browser.wsEndpoint is not a function
-
-      82 |       // Run Lighthouse audit with mobile configuration
-      83 |       const { lhr } = await lighthouse('http://localhost:3000', {
-    > 84 |         port: new URL(browser.wsEndpoint()).port,
-         |                               ^
-      85 |         output: 'json',
-      86 |         logLevel: 'info',
-      87 |         onlyCategories: ['performance'],
-        at /workspace/tests/performance/lighthouse.spec.ts:84:31
-]]>
-</failure>
-</testcase>
-<testcase name="Lighthouse Performance Tests › Performance Budget Validation" classname="performance/lighthouse.spec.ts" time="1.427">
-<failure message="lighthouse.spec.ts:121:7 Performance Budget Validation" type="FAILURE">
-<![CDATA[  [Mobile Safari] › performance/lighthouse.spec.ts:121:7 › Lighthouse Performance Tests › Performance Budget Validation 
 
     TypeError: browser.wsEndpoint is not a function
 
