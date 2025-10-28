@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-10-23T23:53:58.141Z",
+  "timestamp": "2025-10-24T00:51:57.622Z",
   "budgets": {
     "totalSize": 1500,
     "gzipSize": 400,
@@ -22,11 +22,11 @@
   "budgetResults": [
     {
       "name": "JavaScript Size",
-      "actual": 1167,
+      "actual": 1168,
       "budget": 1200,
       "criticalBudget": 1500,
       "status": "passed",
-      "exceeded": -33
+      "exceeded": -32
     },
     {
       "name": "CSS Size",
@@ -38,11 +38,11 @@
     },
     {
       "name": "Total Bundle Size",
-      "actual": 1229,
+      "actual": 1230,
       "budget": 1500,
       "criticalBudget": 2000,
       "status": "passed",
-      "exceeded": -271
+      "exceeded": -270
     }
   ],
   "recommendations": [
